@@ -2,22 +2,30 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+ * Dhira Industries design tokens (CSS variables).
+ * These back the Tailwind color/font tokens in tailwind.config.ts and are
+ * the single source of truth for the storefront + admin visual language.
+ */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-background: #fbf5ea; /* warm cream */
+  --color-foreground: #25160f; /* deep cocoa */
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  color: var(--color-foreground);
+  background: var(--color-background);
+  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+}
+
+@layer base {
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display), Georgia, serif;
+    letter-spacing: 0.01em;
+  }
 }
 
 @layer utilities {
@@ -25,3 +33,4 @@ body {
     text-wrap: balance;
   }
 }
+
