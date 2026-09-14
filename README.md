@@ -1,36 +1,67 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Dhira Industries - Commerce Platform
 
-## Getting Started
+Modular-monolith Next.js application for the Dhira Industries e-commerce
+platform. Phase 1 establishes the technical/visual foundation only.
 
-First, run the development server:
+## Stack
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- Next.js 14 (App Router) + React 18 + TypeScript (strict)
+- Tailwind CSS with the Dhira design tokens (`tailwind.config.ts`)
+- PostgreSQL + Prisma ORM (`prisma/schema.prisma`)
+- Zod + `@t3-oss/env-nextjs` for validated environment config (`src/config/env.ts`)
+- Vitest + React Testing Library
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Local development
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. Copy `.env.example` to `.env` (a working `.env` with local Docker
+   defaults is already included for development).
+2. Start local Postgres + Redis:
+   ```bash
+   docker compose up -d
+   ```
+3. Install dependencies and generate the Prisma client:
+   ```bash
+   npm install
+   npm run db:generate
+   ```
+4. Apply migrations and seed development data:
+   ```bash
+   npm run db:migrate
+   npm run db:seed
+   ```
+5. Run the app:
+   ```bash
+   npm run dev
+   ```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Scripts
 
-## Learn More
+- `npm run dev` / `build` / `start` - Next.js app
+- `npm run lint` / `typecheck` / `test` - quality gates
+- `npm run db:migrate` / `db:seed` / `db:studio` - Prisma workflows
 
-To learn more about Next.js, take a look at the following resources:
+## Admin (local development)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+The admin console lives at `/admin` and is protected by `src/middleware.ts`.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. In your local `.env` (git-ignored), set your own values:
+   ```bash
+   DEV_ADMIN_NAME="Dhira Dev Admin"
+   DEV_ADMIN_EMAIL="you@example.local"
+   DEV_ADMIN_PASSWORD="your-own-local-password"
+   ```
+2. Run `npm run db:seed`. It hashes the password with bcrypt (cost 12) and
+   upserts a `SUPER_ADMIN` account.
+3. Visit `http://localhost:3000/admin/login` and sign in with those values.
 
-## Deploy on Vercel
+`DEV_ADMIN_PASSWORD` is only ever read from the environment - it is never
+committed. The seed refuses to create this account when `NODE_ENV=production`,
+so demo credentials are never provisioned automatically in production.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Architecture notes
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- All server-side data access flows through `src/server/db.ts` (the single
+  Prisma client) and domain services under `src/server/services/*`.
+- The data rule for this project: **Admin -> API/service layer -> PostgreSQL
+  -> Storefront**. Storefront components must never hardcode business data.
+- Seed data in `prisma/seed.ts` is explicitly DEVELOPMENT-only demo data.
