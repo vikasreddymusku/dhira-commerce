@@ -207,6 +207,93 @@ async function seedDevelopmentAdmin() {
   console.log(`Development admin ready for ${email} (role: SUPER_ADMIN).`);
 }
 
+const HOMEPAGE_SECTION_SEEDS = [
+  {
+    key: "hero",
+    title: "Rich. Pure. Single-Origin.",
+    subtitle: "Cocoa and couverture chocolate, traced from a single Indian estate to your kitchen.",
+    content: {
+      body: "Dhira Industries crafts small-batch couverture and cocoa ingredients from beans we know by name - grown, fermented, and dried on one estate, then worked with restraint in our own facility.",
+    },
+  },
+  {
+    key: "story",
+    title: "One Estate. One Story.",
+    subtitle: "Single-origin, from soil to bar",
+    content: {
+      body: "Every batch begins on the same estate soil - not a blend of origins, but one farm's cocoa, followed from pod to finished couverture. We work in small volumes so flavour, not scale, stays the priority.",
+    },
+  },
+  {
+    key: "craft",
+    title: "The Craft of Restraint",
+    subtitle: "Cocoa, worked with patience",
+    content: {
+      body: "Fermentation, sun-drying, stone-grinding, conching - each stage is timed by feel, not formula. We add nothing to mask the bean; the character comes from the origin and the care.",
+      items: [
+        { label: "Fermentation", caption: "6-8 days, open-air boxes, turned by hand" },
+        { label: "Drying", caption: "Sun-dried slowly for even moisture and flavour" },
+        { label: "Conching", caption: "Long, slow conching for a clean, rounded melt" },
+      ],
+    },
+  },
+  {
+    key: "b2b",
+    title: "For Chocolatiers & Bakers",
+    subtitle: "Wholesale & Professional Supply",
+    content: {
+      body: "We supply couverture, cocoa mass, butter, and powder in bulk formats to confectioners, bakeries, and cocoa manufacturers - with consistent origin, consistent temper, and direct traceability.",
+    },
+  },
+  {
+    key: "experiences",
+    title: "Visit the Works",
+    subtitle: "Factory tours & tasting sessions",
+    content: {
+      body: "Step inside our processing facility to see beans become couverture - from stone grinding to conching - and taste our range straight from the line.",
+    },
+  },
+  {
+    key: "social",
+    title: "Life at Dhira",
+    subtitle: "@dhiraindustries",
+    content: { body: "Notes from the estate, the factory floor, and the tasting table." },
+  },
+  {
+    key: "newsletter",
+    title: "Stay Close to the Source",
+    subtitle: "Journal & new releases",
+    content: {
+      body: "Occasional notes on harvests, new releases, and how we work. No spam - just cocoa.",
+    },
+  },
+] as const;
+
+const SITE_SETTING_SEEDS = [
+  { key: "announcement_bar", value: { text: "Single-origin couverture, milled and conched in small batches - shipping across India." } },
+  { key: "wholesale_email", value: { text: "wholesale@dhiraindustries.com" } },
+];
+
+const RECIPE_SEEDS = [
+  {
+    title: "Dark Couverture Ganache Tart",
+    slug: "dark-couverture-ganache-tart",
+    summary: "A silky 70% couverture ganache set in a cocoa-nib shortcrust shell.",
+  },
+  {
+    title: "Single-Origin Hot Chocolate",
+    slug: "single-origin-hot-chocolate",
+    summary: "Slow-melted 55% couverture, whole milk, and a pinch of sea salt.",
+  },
+  {
+    title: "Cocoa Nib Financiers",
+    slug: "cocoa-nib-financiers",
+    summary: "Brown-butter financiers finished with a scatter of roasted cocoa nibs.",
+  },
+];
+
+const FEATURED_PRODUCT_SLUGS = ["dark-couverture-70", "dark-couverture-55", "cocoa-butter", "natural-cocoa-powder"];
+
 async function main() {
   console.log("Seeding DEVELOPMENT data for Dhira Industries...");
 
@@ -288,7 +375,49 @@ async function main() {
     }
   }
 
+  for (const slug of FEATURED_PRODUCT_SLUGS) {
+    await prisma.product.updateMany({ where: { slug }, data: { isFeatured: true } });
+  }
+
+  for (const section of HOMEPAGE_SECTION_SEEDS) {
+    await prisma.homepageSection.upsert({
+      where: { key: section.key },
+      update: {
+        title: section.title,
+        subtitle: section.subtitle,
+        content: section.content,
+        status: "PUBLISHED",
+      },
+      create: {
+        key: section.key,
+        title: section.title,
+        subtitle: section.subtitle,
+        content: section.content,
+        status: "PUBLISHED",
+      },
+    });
+  }
+
+  for (const setting of SITE_SETTING_SEEDS) {
+    await prisma.siteSetting.upsert({
+      where: { key: setting.key },
+      update: { value: setting.value },
+      create: setting,
+    });
+  }
+
+  for (const recipe of RECIPE_SEEDS) {
+    await prisma.recipe.upsert({
+      where: { slug: recipe.slug },
+      update: { title: recipe.title, summary: recipe.summary, status: "PUBLISHED", publishedAt: new Date() },
+      create: { ...recipe, status: "PUBLISHED", publishedAt: new Date() },
+    });
+  }
+
   console.log(`Seeded ${PRODUCT_SEEDS.length} development products with variants and inventory.`);
+  console.log(
+    `Seeded ${HOMEPAGE_SECTION_SEEDS.length} homepage sections, ${SITE_SETTING_SEEDS.length} site settings, ${RECIPE_SEEDS.length} recipes.`,
+  );
 }
 
 main()

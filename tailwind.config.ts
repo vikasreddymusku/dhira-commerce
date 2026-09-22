@@ -104,6 +104,9 @@ const config: Config = {
       screens: {
         xs: "420px",
       },
+      transitionTimingFunction: {
+        editorial: "cubic-bezier(0.22, 1, 0.36, 1)",
+      },
     },
   },
   plugins: [],

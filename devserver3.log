@@ -1,0 +1,17 @@
+
+> dhira-commerce@0.1.0 dev
+> next dev
+
+  ▲ Next.js 14.2.35
+  - Local:        http://localhost:3000
+  - Environments: .env
+
+ ✓ Starting...
+ ✓ Ready in 34.2s
+ ○ Compiling / ...
+ ✓ Compiled / in 18.8s (637 modules)
+ ✓ Compiled in 3.5s (286 modules)
+ ✓ Compiled in 366ms (272 modules)
+ GET / 200 in 22964ms
+ GET / 200 in 350ms
+ ✓ Compiled in 5.1s (286 modules)

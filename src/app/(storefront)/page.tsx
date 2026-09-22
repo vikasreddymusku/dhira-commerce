@@ -1,30 +1,48 @@
-import { Container } from "@/components/ui/container";
+import { getHomepageData } from "@/server/services/storefront/homepage.service";
+import { Hero } from "@/components/storefront/hero";
+import { CategoryDiscovery } from "@/components/storefront/category-discovery";
+import { FeaturedProducts } from "@/components/storefront/featured-products";
+import { BestSellers } from "@/components/storefront/best-sellers";
+import { StorySection } from "@/components/storefront/story-section";
+import { CraftSection } from "@/components/storefront/craft-section";
+import { RecipesPreview } from "@/components/storefront/recipes-preview";
+import { B2BSection } from "@/components/storefront/b2b-section";
+import { ExperiencesSection } from "@/components/storefront/experiences-section";
+import { SocialSection } from "@/components/storefront/social-section";
+import { NewsletterSection } from "@/components/storefront/newsletter-section";
+
+// Revalidate periodically so Admin-driven content changes (HomepageSection,
+// SiteSetting, Product.isFeatured, Recipe, Category) reach the storefront
+// without requiring a full redeploy.
+export const revalidate = 60;
 
 /**
- * Placeholder landing page - Phase 1 provides only the foundational
- * storefront shell (header/footer/typography/tokens). The full homepage
- * experience (hero, featured products, story sections, etc.) is
- * intentionally deferred to a later phase and will be database-driven via
- * the HomepageSection model rather than hardcoded here.
+ * Dhira Industries homepage.
  *
- * No call-to-action button is rendered yet, because no catalogue route
- * exists - a visible CTA that leads nowhere would violate the Phase 1 rule
- * against controls that appear functional.
+ * All copy/imagery-captions/product data is fetched from the database via
+ * src/server/services/storefront/homepage.service.ts (HomepageSection,
+ * SiteSetting, Product/ProductVariant, Category, Recipe models from Phase 1)
+ * - nothing here hardcodes business content. Sections render nothing when
+ * their backing content is absent, so an unpublished section never shows a
+ * broken placeholder.
  */
-export default function HomePage() {
+export default async function HomePage() {
+  const data = await getHomepageData();
+
   return (
-    <Container className="flex min-h-[70vh] flex-col items-center justify-center gap-6 py-24 text-center">
-      <p className="text-xs font-semibold uppercase tracking-widest text-gold-500">
-        Single-Origin &middot; Est. 2010
-      </p>
-      <h1 className="max-w-2xl font-display text-4xl text-cocoa-900 sm:text-5xl">
-        Dhira Industries
-      </h1>
-      <p className="max-w-xl text-base text-cocoa-600">
-        The Dhira storefront foundation is live. Our full catalogue and story
-        are being crafted with the same care as our chocolate.
-      </p>
-    </Container>
+    <>
+      <Hero content={data.hero} />
+      <CategoryDiscovery categories={data.categories} />
+      <FeaturedProducts products={data.featuredProducts} />
+      <StorySection content={data.story} />
+      <CraftSection content={data.craft} />
+      <BestSellers products={data.bestSellers} />
+      <ExperiencesSection content={data.experiences} />
+      <RecipesPreview recipes={data.recipes} />
+      <B2BSection content={data.b2b} contactEmail={data.wholesaleEmail} />
+      <SocialSection content={data.social} />
+      <NewsletterSection content={data.newsletter} />
+    </>
   );
 }
 

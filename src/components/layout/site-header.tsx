@@ -16,29 +16,29 @@ export function SiteHeader() {
   const accountItems = liveNavItems(ACCOUNT_NAV);
 
   return (
-    <header className="border-b border-cocoa-100/60 bg-cream-50/95 backdrop-blur">
-      <Container className="flex h-20 items-center justify-between">
+    <header className="sticky top-0 z-40 border-b border-cocoa-100/70 bg-cream-50/90 backdrop-blur-md">
+      <Container className="flex h-20 items-center justify-between sm:h-24">
         <Link href="/" className="flex items-center gap-3">
           <Image
             src="/brand/dhira-logo.png.jpeg"
             alt="Dhira Industries"
             width={44}
             height={44}
-            className="h-11 w-11 object-contain"
+            className="h-9 w-9 object-contain sm:h-11 sm:w-11"
             priority
           />
-          <span className="font-display text-lg tracking-wide text-cocoa-800">
+          <span className="font-display text-base tracking-wide text-cocoa-800 sm:text-lg">
             Dhira Industries
           </span>
         </Link>
 
         {navItems.length > 0 && (
-          <nav className="hidden items-center gap-8 md:flex">
+          <nav className="hidden items-center gap-10 md:flex">
             {navItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
-                className="text-sm font-medium tracking-wide text-cocoa-700 transition-colors hover:text-cocoa-900"
+                className="text-sm font-medium tracking-wide text-cocoa-700 transition-colors duration-200 ease-editorial hover:text-cocoa-900"
               >
                 {item.label}
               </Link>
@@ -47,7 +47,7 @@ export function SiteHeader() {
         )}
 
         {accountItems.length > 0 && (
-          <div className="flex items-center gap-4 text-sm font-medium text-cocoa-700">
+          <div className="flex items-center gap-5 text-sm font-medium text-cocoa-700">
             {accountItems.map((item) => (
               <Link key={item.href} href={item.href} className="hover:text-cocoa-900">
                 {item.label}
